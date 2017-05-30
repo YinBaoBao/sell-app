@@ -1,9 +1,10 @@
 <template>
-    <div class="header">
-      I am heder 标签！
+    <div>
+        I am goods.
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
     export default {};
 </script>
+
