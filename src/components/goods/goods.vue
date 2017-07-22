@@ -30,19 +30,24 @@
                   <span class="now">￥{{food.price}}</span>
                   <span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol @add="addFood" :food="food"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <shopcart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
+    <shopcart ref="shopcart" :selectFoods="selectFoods" :deliveryPrice="seller.deliveryPrice"
+              :minPrice="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from '../shopcart/shopcart';
+  import cartcontrol from '../cartcontrol/cartcontrol';
 
   const ERR_OK = 0;
 
@@ -69,6 +74,17 @@
           }
         }
         return 0;
+      },
+      selectFoods () {
+        let foods = [];
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count > 0) {
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     created () {
@@ -99,6 +115,7 @@
         });
 
         this.foodScroll = new BScroll(this.$refs.foodWrapper, {
+          click: true,
           probeType: 3
         });
 
@@ -115,10 +132,19 @@
           height += item.clientHeight;
           this.listHeight.push(height);
         }
+      },
+      addFood (target) { // 小球加到购物车动画钩子事件
+        this._drop(target);
+      },
+      _drop (target) {
+        this.$nextTick(() => {  // 体验优化，异步执行下落动画
+          this.$refs.shopcart.drop(target);
+        });
       }
     },
     components: {
-      shopcart
+      shopcart,
+      cartcontrol
     }
   };
 </script>
@@ -225,5 +251,9 @@
                 font-size: 10px
                 color: rgb(147, 153, 159)
 
+            .cartcontrol-wrapper
+              position: absolute
+              right: 0
+              bottom: 12px
 </style>
 
